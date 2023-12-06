@@ -15,6 +15,44 @@ export default function Addpost() {
 
     const [detail, setDetail] = useState('')
 
+    const [Cat, SetCat] = useState([])
+    const [Subcat, SetSubcat] = useState([])
+
+
+    useEffect(() => {
+        getCategory()
+        getSubCategory()
+    }, [])
+
+
+    const getCategory = () => {
+        let x = []
+        const db = firebaseApp.firestore();
+        db.collection('Category').get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                console.log(doc.data())
+                x.push(doc.data())
+                SetCat(x)
+            })
+        }).catch(err => {
+            console.error(err)
+        });
+    }
+
+    const getSubCategory = () => {
+        let x = []
+        const db = firebaseApp.firestore();
+        db.collection('SubCategory').get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                console.log(doc.data())
+                x.push(doc.data())
+                SetSubcat(x)
+            })
+        }).catch(err => {
+            console.error(err)
+        });
+    }
+
 
 
     const formik = useFormik({
@@ -89,9 +127,36 @@ export default function Addpost() {
 
 
 
-                        <div className="col-lg-12 mt-5">
+
+                        <div className="col-lg-6 mt-5">
+                            <label htmlFor="">Select Category:</label>
+                            <select className='form-control' name="" id="">
+                                <option selected>Select the Category</option>
+                                {
+                                    Cat && Cat.length > 0 && Cat.map((i) => (
+                                        <option value={i.id} >{i.Category}</option>
+                                    ))
+                                }
+
+                            </select>
+                        </div>
+
+                        <div className="col-lg-6 mt-5">
+                            <label htmlFor="">Select Sub Category:</label>
+                            <select className='form-control' name="" id="">
+                                <option selected>Select the Sub Category</option>
+                                {
+                                    Subcat && Subcat.length > 0 && Subcat.map((i) => (
+                                        <option value={i.id} >{i.SubCate}</option>
+                                    ))
+                                }
+
+                            </select>
+                        </div>
+
+                        <div className="col-lg-12 mt-5 ">
                             <label htmlFor="Story Details *">Story Details *:</label>
-                            <ReactQuill theme="snow" value={detail} onChange={setDetail} />
+                            <ReactQuill style={{ height: "40vh" }} theme="snow" value={detail} onChange={setDetail} />
                         </div>
 
 

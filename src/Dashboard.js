@@ -14,24 +14,26 @@ import article from "./assets/Articles.png";
 import categori from "./assets/category.png";
 import subcate from "./assets/Subcategories.png";
 import users from "./assets/users.png";
-import Accordion from 'react-bootstrap/Accordion';
+import MUIDataTable from "mui-datatables";
 
 
 let GlobalImage = ''
 
 export default function Dashboard() {
 
+    const [showModal, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+    const [Value, SetValue] = useState('')
+
     useEffect(() => {
         var url = window.location.pathname;
         var id = url.substring(url.lastIndexOf('/') + 1);
         setID(id)
         getCat()
-
-
-
     }, [])
 
-    const [oldData, setoldData] = useState([])
     const [oldCate, setoldCate] = useState([])
 
     const [ID, setID] = useState('')
@@ -39,18 +41,56 @@ export default function Dashboard() {
 
 
 
+
+    const columns = [
+        {
+            name: "Category",
+            label: "Category",
+            options: {
+                filter: true,
+                sort: true,
+            }
+        },
+
+        {
+            name: "status",
+            label: "status",
+            options: {
+                filter: true,
+                sort: false,
+            }
+        },
+        {
+            name: "id",
+            label: "View",
+            options: {
+                filter: true,
+                sort: false,
+                customBodyRender: (value, tableMeta, updateValue) => (
+                    <button className='btn btn-primary' onClick={() => SubCategories(value)}> View Sub Category</button>
+                )
+            }
+        },
+
+    ];
+
+    const SubCategories = (value) => {
+        console.log(value, "Asd")
+        SetValue(value)
+        handleShow()
+
+    }
+
+
     const getCat = () => {
-        console.log("come")
         let x = []
         const db = firebaseApp.firestore();
         db.collection('Category').get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 x.push(doc.data())
                 x.sort(compares)
-                console.log(x, "Sorted array")
-                let lastNumber = x[x.length - 1].CatNumber;
-                setNumber(lastNumber + 1)
                 setoldCate(x)
+
             })
         }).catch(err => {
             console.error(err)
@@ -133,10 +173,8 @@ export default function Dashboard() {
                         theme: "light",
                     });
                     getCat()
-                    // handleClose1()
+                    handleClose1()
                     setcateGories('')
-
-
                 })
                 .catch((error) => {
                     console.error("Please check form again ", error);
@@ -151,7 +189,9 @@ export default function Dashboard() {
 
     }
 
-
+    const options = {
+        selectableRows: false
+    };
 
     return (
         <>
@@ -165,10 +205,9 @@ export default function Dashboard() {
 
                 <div className="container-fluid">
                     <div className="row mt-4">
-                        <div className="col-lg-3 col-md-6" style={{ backgroundColor: "#f7f7f7" }}>
+                        <div className="col-lg-3 col-md-6 " style={{ backgroundColor: "#f7f7f7" }}>
                             <img src={users} className='img-fluid' />
                             <h4>1356</h4>
-
                             <h6>Total Users</h6>
                         </div>
                         <div className="col-lg-3  col-md-6" style={{ backgroundColor: "#f7f7f7" }}>
@@ -194,6 +233,8 @@ export default function Dashboard() {
 
 
 
+
+
                 <Modal show={showModal1} onHide={handleClose1}>
                     <Modal.Header closeButton>
                         <Modal.Title>Add Categories</Modal.Title>
@@ -213,10 +254,40 @@ export default function Dashboard() {
                     </Modal.Footer>
                 </Modal>
 
-                <div className="accordion mt-5">
 
+                <Modal show={showModal} onHide={handleClose}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>View</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <h1>{Value}</h1>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleClose}>
+                            Close
+                        </Button>
+                        <Button variant="primary" onClick={handleClose}>
+                            Save Changes
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+
+                <div className="container-fluid mt-3">
+                    <div className="row">
+                        <div className="col-lg-12">
+                            <MUIDataTable
+                                title={"Categories List"}
+                                data={oldCate}
+                                columns={columns}
+                                options={options}
+                            />
+                        </div>
+                    </div>
                 </div>
+
             </div >
+
+
             <ToastContainer />
         </>
 

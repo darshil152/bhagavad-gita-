@@ -21,12 +21,12 @@ export default function Header() {
             <Navbar className="bg-body-tertiary justify-content-between header">
                 <img src={krishna} className='img2 p-3' />
 
-                <div className="col-md-3  ms-auto mt-2">
+                {/* <div className="col-md-3  ms-auto mt-2">
                     <select onChange={(e) => onLanguageChange(e.target.value)} class="form-select secondclass" aria-label="Default select example">
                         <option selected={language == 'english' ? true : false} value="english">  english</option>
                         <option selected={language == 'gujarati' ? true : false} value="gujarati">  Guajrati </option>
                     </select>
-                </div>
+                </div> */}
 
                 <Form inline>
                     <Row>

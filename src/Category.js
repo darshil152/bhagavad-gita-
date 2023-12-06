@@ -21,6 +21,7 @@ export default function Category() {
         var url = window.location.pathname;
         var id = url.substring(url.lastIndexOf('/') + 1);
         setID(id)
+        getcategories()
 
 
 
@@ -32,6 +33,7 @@ export default function Category() {
 
     const [oldData, setoldData] = useState([])
     const [ID, setID] = useState('')
+    const [Value, setValue] = useState('')
 
     const [datas, setData] = useState([]);
     const [preview, setPreview] = useState('')
@@ -40,6 +42,7 @@ export default function Category() {
 
     const [Gudetail, setGUDetail] = useState('')
 
+    const [Categories, setCategories] = useState([])
 
 
     const [showModal, setShow] = useState(false);
@@ -95,6 +98,7 @@ export default function Category() {
                 });
 
             } else {
+
                 let obj = {
                     SubCate: values.SubCategory,
                     Description: values.Description,
@@ -103,9 +107,8 @@ export default function Category() {
                     GuDetail: Gudetail,
                     id: makeid(6),
                     status: 0,
+                    MainCategory: Value,
                 }
-
-
                 let registerQuery = new Promise((resolve, reject) => {
                     let db = firebaseApp.firestore();
                     db.collection("SubCategory").add(obj)
@@ -232,6 +235,20 @@ export default function Category() {
     }
 
 
+    const getcategories = () => {
+        let x = []
+        const db = firebaseApp.firestore();
+        db.collection('Category').get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                console.log(doc.data())
+                x.push(doc.data())
+                setCategories(x)
+            })
+        }).catch(err => {
+            console.error(err)
+        });
+    }
+
     const getData = (id) => {
         let x = []
         const db = firebaseApp.firestore();
@@ -252,6 +269,9 @@ export default function Category() {
 
     console.log(GlobalImage)
 
+    const HandleChange = (e) => {
+        setValue(e.target.value)
+    }
     return (
         <>
             <Layout />
@@ -269,6 +289,19 @@ export default function Category() {
                     <Modal.Body>
                         <form className="form" onSubmit={formik.handleSubmit}>
                             <div className="row">
+
+                                <div className="col-lg-12 ">
+                                    <label htmlFor="">Select Sub Category:</label>
+                                    <select className='form-control' name="" id="" onChange={HandleChange}>
+                                        <option selected >Select the Sub Category</option>
+                                        {
+                                            Categories && Categories.length > 0 && Categories.map((i) => (
+                                                <option value={i.id} >{i.Category}</option>
+                                            ))
+                                        }
+
+                                    </select>
+                                </div>
                                 <div className="col-lg-12 mb-3">
                                     <div className="form-group">
                                         <label for="SubCategory">Sub Category Name * </label>

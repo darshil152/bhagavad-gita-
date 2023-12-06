@@ -222,3 +222,7 @@ button.eyepass {
   bottom: 27px;
   right: 15px;
 }
+
+td.MuiTableCell-root.MuiTableCell-footer.MuiTableCell-sizeMedium.tss-1ork7hi-MUIDataTablePagination-tableCellContainer.css-nfmglb-MuiTableCell-root {
+  display: none;
+}
