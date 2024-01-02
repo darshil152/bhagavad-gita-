@@ -18,6 +18,10 @@ export default function Addpost() {
     const [Cat, SetCat] = useState([])
     const [Subcat, SetSubcat] = useState([])
 
+    const [selectedcat, SetselectedCat] = useState("")
+    const [selectedsubcat, SetselectedSubcat] = useState("")
+
+
 
     useEffect(() => {
         getCategory()
@@ -61,8 +65,8 @@ export default function Addpost() {
 
         },
         validationSchema: Yup.object({
-            // title: Yup.string()
-            //     .required("Title is Required"),
+            title: Yup.string()
+                .required("Title is Required"),
             // Description: Yup.string()
             //     .required("Description   is Required"),
 
@@ -72,8 +76,33 @@ export default function Addpost() {
             let obj = {
                 Title: values.title,
                 PostDetail: detail,
+                id: makeid(6),
+                Category: selectedcat,
+                SubCatefory: selectedsubcat,
             }
-            console.log(obj)
+
+            let registerQuery = new Promise((resolve, reject) => {
+                let db = firebaseApp.firestore();
+                db.collection("Posts").add(obj)
+
+                    .then((docRef) => {
+                        console.log("Document written with ID: ", docRef);
+                        resolve(docRef.id);
+
+                    })
+                    .catch((error) => {
+                        console.error("Please check form again ", error);
+                        reject(error);
+                    });
+            });
+            registerQuery.then(result => {
+                console.warn('register successful')
+            }).catch(error => {
+                console.error(error)
+            })
+
+
+
 
 
 
@@ -130,7 +159,7 @@ export default function Addpost() {
 
                         <div className="col-lg-6 mt-5">
                             <label htmlFor="">Select Category:</label>
-                            <select className='form-control' name="" id="">
+                            <select className='form-control' name="" id="" onChange={(e) => SetselectedCat(e.target.value)}>
                                 <option selected>Select the Category</option>
                                 {
                                     Cat && Cat.length > 0 && Cat.map((i) => (
@@ -143,7 +172,7 @@ export default function Addpost() {
 
                         <div className="col-lg-6 mt-5">
                             <label htmlFor="">Select Sub Category:</label>
-                            <select className='form-control' name="" id="">
+                            <select className='form-control' name="" id="" onChange={(e) => SetselectedSubcat(e.target.value)}>
                                 <option selected>Select the Sub Category</option>
                                 {
                                     Subcat && Subcat.length > 0 && Subcat.map((i) => (

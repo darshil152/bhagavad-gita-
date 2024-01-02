@@ -19,6 +19,8 @@ import MUIDataTable from "mui-datatables";
 
 let GlobalImage = ''
 
+let FinalSubCategory = []
+
 export default function Dashboard() {
 
     const [showModal, setShow] = useState(false);
@@ -26,19 +28,55 @@ export default function Dashboard() {
     const handleShow = () => setShow(true);
 
     const [Value, SetValue] = useState('')
+    const [Subcates, setSubcates] = useState([])
+
 
     useEffect(() => {
         var url = window.location.pathname;
         var id = url.substring(url.lastIndexOf('/') + 1);
         setID(id)
         getCat()
+        getUsers()
+        subcates()
     }, [])
+
+
+
+    const subcates = () => {
+        let x = []
+        const db = firebaseApp.firestore();
+        db.collection('SubCategory').get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                x.push(doc.data())
+                setSubcates(x)
+
+            })
+        }).catch(err => {
+            console.error(err)
+        });
+    }
+
+
+    const getUsers = () => {
+        let x = []
+        const db = firebaseApp.firestore();
+        db.collection('Users').get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                x.push(doc.data())
+                setusers(x)
+
+            })
+        }).catch(err => {
+            console.error(err)
+        });
+    }
 
     const [oldCate, setoldCate] = useState([])
 
     const [ID, setID] = useState('')
 
 
+    const [Users, setusers] = useState([])
 
 
 
@@ -67,15 +105,19 @@ export default function Dashboard() {
                 filter: true,
                 sort: false,
                 customBodyRender: (value, tableMeta, updateValue) => (
-                    <button className='btn btn-primary' onClick={() => SubCategories(value)}> View Sub Category</button>
+                    <button className='btn btn-primary' onClick={() => SubCategories(value, tableMeta)}> View Sub Category</button>
                 )
             }
         },
 
     ];
 
-    const SubCategories = (value) => {
-        console.log(value, "Asd")
+    const SubCategories = (value, tableMeta) => {
+        for (let i = 0; i < oldCate.length; i++) {
+            if (oldCate[i].id == value) {
+                FinalSubCategory = oldCate[i].SubCategory
+            }
+        }
         SetValue(value)
         handleShow()
 
@@ -207,18 +249,18 @@ export default function Dashboard() {
                     <div className="row mt-4">
                         <div className="col-lg-3 col-md-6 " style={{ backgroundColor: "#f7f7f7" }}>
                             <img src={users} className='img-fluid' />
-                            <h4>1356</h4>
+                            <h4>{Users.length}</h4>
                             <h6>Total Users</h6>
                         </div>
                         <div className="col-lg-3  col-md-6" style={{ backgroundColor: "#f7f7f7" }}>
                             <img src={categori} className='img-fluid' />
-                            <h4>1356</h4>
+                            <h4>{oldCate.length}</h4>
 
                             <h6>Total Categories</h6>
                         </div>
                         <div className="col-lg-3  col-md-6" style={{ backgroundColor: "#f7f7f7" }}>
                             <img src={subcate} className='img-fluid' />
-                            <h4>1356</h4>
+                            <h4>{Subcates.length}</h4>
 
                             <h6>Total Sub Categories</h6>
                         </div>
@@ -257,10 +299,28 @@ export default function Dashboard() {
 
                 <Modal show={showModal} onHide={handleClose}>
                     <Modal.Header closeButton>
-                        <Modal.Title>View</Modal.Title>
+                        <Modal.Title>Sub Categories</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <h1>{Value}</h1>
+                        <div className="container">
+                            <div className="row">
+
+
+
+                                {
+                                    FinalSubCategory && FinalSubCategory.length > 0 && FinalSubCategory.map((i) => {
+                                        return (
+                                            <>
+                                                <div className="col-lg-4">
+                                                    <img src={i.Image} className='img-fluid' />
+                                                    <p className='text-center'>{i.SubCate}</p>
+                                                </div>
+                                            </>
+                                        )
+                                    })
+                                }
+                            </div>
+                        </div>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={handleClose}>

@@ -44,6 +44,8 @@ export default function Category() {
 
     const [Categories, setCategories] = useState([])
 
+    const [cart, setCart] = useState([])
+
 
     const [showModal, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -109,6 +111,10 @@ export default function Category() {
                     status: 0,
                     MainCategory: Value,
                 }
+                console.log(obj)
+
+
+
                 let registerQuery = new Promise((resolve, reject) => {
                     let db = firebaseApp.firestore();
                     db.collection("SubCategory").add(obj)
@@ -127,10 +133,10 @@ export default function Category() {
                             });
                             handleClose()
                             navigate('/post')
-
                             formik.resetForm()
                             setImg('')
                             setDetail('')
+                            UpdateCategory(obj)
 
 
                         })
@@ -147,6 +153,45 @@ export default function Category() {
             }
         }
     });
+
+
+    const UpdateCategory = (obj) => {
+
+
+        let x = cart
+
+
+        for (let i = 0; i < Categories.length; i++) {
+            if (Categories[i].id == obj.MainCategory) {
+                x.push(obj)
+            }
+        }
+
+
+
+
+        const db = firebaseApp.firestore();
+        db.collection('Category').where("id", "==", obj.MainCategory).get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                var updateCollection = db.collection("Category").doc(doc.ref.id);
+                return updateCollection.update({
+                    SubCategory: x
+
+                })
+                    .then(() => {
+                        console.log("Document successfully updated!");
+
+
+                    })
+                    .catch((error) => {
+                        // The document probably doesn't exist.
+                        console.error("Error updating document: ", error);
+                    });
+            })
+        }).catch(err => {
+            console.error(err)
+        });
+    }
 
 
 
@@ -227,7 +272,9 @@ export default function Category() {
         myPromise.then(url => {
             console.log(url)
             setImg(url)
-            // setshowLoader(false)
+            GlobalImage = url
+            setPreview(url)
+            // setshowLoader
 
         }).catch(err => {
             console.log('error caught', err)
@@ -242,6 +289,14 @@ export default function Category() {
             querySnapshot.forEach((doc) => {
                 console.log(doc.data())
                 x.push(doc.data())
+
+
+                if (doc.data().SubCategory?.length > 0) {
+                    setCart(doc.data().SubCategory)
+                } else {
+                    setCart([])
+                }
+
                 setCategories(x)
             })
         }).catch(err => {
@@ -291,9 +346,9 @@ export default function Category() {
                             <div className="row">
 
                                 <div className="col-lg-12 ">
-                                    <label htmlFor="">Select Sub Category:</label>
+                                    <label htmlFor="">Select main Category:</label>
                                     <select className='form-control' name="" id="" onChange={HandleChange}>
-                                        <option selected >Select the Sub Category</option>
+                                        <option selected >Select the main Category</option>
                                         {
                                             Categories && Categories.length > 0 && Categories.map((i) => (
                                                 <option value={i.id} >{i.Category}</option>

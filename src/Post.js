@@ -42,8 +42,6 @@ export default function Post() {
         const db = firebaseApp.firestore();
         db.collection('SubCategory').get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
-
-
                 console.log(doc.data())
                 x.push(doc.data())
                 setData(x)
